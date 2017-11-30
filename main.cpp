@@ -79,7 +79,7 @@ _uint_ test(_uint_ const & num_frames, std::vector<_uint_> const & sequence) {
     std::queue<_uint_> queue;
 
     // Number of page faults detected
-    _uint_ pageFaults;
+    _uint_ pageFaults = 0;
 
     for (auto && page : sequence) {
         if (memory.find(page) == memory.end()) {
