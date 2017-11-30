@@ -98,13 +98,49 @@ _uint_ test(_uint_ const & num_frames, std::vector<_uint_> const & sequence) {
     return pageFaults;
 }
 
+// Prints an informative message when Belady's Anomaly is detected
+//
+// @sequence   : The sequence id being tested
+// @frames1    : The smaller number of frames (first test)
+// @frames2    : The larger number of frames (second test) 
+// @pageFaults1: The smaller number of page faults (first test) 
+// @pageFaults2: The larger number of page faults (second test) 
+void printAnomaly(_uint_ const & sequence, _uint_ const & frames1, _uint_ const & frames2,
+                  _uint_ const & pageFaults1, _uint_ const & pageFaults2) {
+    std::cout << "Anomaly Discovered!" << std::endl;
+    std::cout << "    Sequence: " << sequence << std::endl
+              << "    Page Faults: " << pageFaults1 << " @ Frame Size: " << frames1 << std::endl
+              << "    Page Faults: " << pageFaults2 << " @ Frame Size: " << frames2 << std::endl;
+}
+
 int main() {
     auto sequences_ptr = generateSequences();
 
     // See documentation on generateSequence to understand what this variable is
     std::map<_uint_, std::shared_ptr<std::vector<_uint_>>> & sequences = *sequences_ptr;
 
-    std::cout << test(MIN_FRAMES, *sequences.at(0)) << std::endl;
+
+    // Contains the number of page faults associated with each run of each sequence
+    // Ex: pageFaults[i][j] contains the number of page faults for the i'th sequence using y frames of memory
+    std::vector<std::map<_uint_, _uint_>> pageFaults(NUM_SEQUENCES);
+
+    // The number of times Belady's Anomaly is detected
+    _uint_ anomalyDetected = 0;
+
+    // Test each sequence from MIN_FRAMES to MAX_FRAMES, steppin by STEP_BY frames per test
+    for (_uint_ i = 0; i < NUM_SEQUENCES; ++i) {
+        bool firstRun = true;
+        for (_uint_ j = MIN_FRAMES; j <= MAX_FRAMES; j += STEP_BY) {
+            pageFaults[i][j] = test(j, *sequences.at(i));
+            if (!firstRun && pageFaults[i][j] > pageFaults[i][j - STEP_BY]) {
+                // Anomaly detected
+                ++anomalyDetected;
+                printAnomaly(i + 1, j - STEP_BY, j, pageFaults[i][j - STEP_BY], pageFaults[i][j]);
+            } else if (firstRun) firstRun = false;
+        }
+    }
+
+    std::cout << std::endl << "Anomaly detected " << anomalyDetected << " times." << std::endl;
 
     return EXIT_SUCCESS;
 }
