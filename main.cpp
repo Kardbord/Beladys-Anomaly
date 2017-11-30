@@ -114,6 +114,9 @@ void printAnomaly(_uint_ const & sequence, _uint_ const & frames1, _uint_ const 
 }
 
 int main() {
+    std::cout << "Length of memory reference string: " << SEQUENCE_SIZE << std::endl
+              << "Frames of physical memory: " << MAX_FRAMES << std::endl << std::endl;
+
     auto sequences_ptr = generateSequences();
 
     // See documentation on generateSequence to understand what this variable is
@@ -121,7 +124,7 @@ int main() {
 
 
     // Contains the number of page faults associated with each run of each sequence
-    // Ex: pageFaults[i][j] contains the number of page faults for the i'th sequence using y frames of memory
+    // Ex: pageFaults[i][j] contains the number of page faults for the i'th sequence using j frames of memory
     std::vector<std::map<_uint_, _uint_>> pageFaults(NUM_SEQUENCES);
 
     // The number of times Belady's Anomaly is detected
