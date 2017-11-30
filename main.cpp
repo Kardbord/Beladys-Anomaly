@@ -119,6 +119,11 @@ int main() {
 
     auto sequences_ptr = generateSequences();
 
+    if (sequences_ptr == nullptr) {
+        std::cout << "ERROR! nullptr" << std::endl;
+        return EXIT_FAILURE;
+    }
+
     // See documentation on generateSequence to understand what this variable is
     std::map<_uint_, std::shared_ptr<std::vector<_uint_>>> & sequences = *sequences_ptr;
 
