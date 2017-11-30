@@ -75,7 +75,7 @@ _uint_ test(_uint_ const & num_frames, std::vector<_uint_> const & sequence) {
     // Tracks the pages that are loaded into memory
     std::unordered_set<_uint_> memory;
 
-    // FIFO queue tracking oldest page
+    // FIFO queue tracking oldest page in memory
     std::queue<_uint_> queue;
 
     // Number of page faults detected
@@ -91,6 +91,8 @@ _uint_ test(_uint_ const & num_frames, std::vector<_uint_> const & sequence) {
             else {
                 memory.erase(queue.front());
                 queue.pop();
+                memory.insert(page);
+                queue.push(page);
             }
         }
     }
@@ -135,7 +137,7 @@ int main() {
     // The number of times Belady's Anomaly is detected
     _uint_ anomalyDetected = 0;
 
-    // Test each sequence from MIN_FRAMES to MAX_FRAMES, steppin by STEP_BY frames per test
+    // Test each sequence from MIN_FRAMES to MAX_FRAMES, stepping by STEP_BY frames per test
     for (_uint_ i = 0; i < NUM_SEQUENCES; ++i) {
         bool firstRun = true;
         for (_uint_ j = MIN_FRAMES; j <= MAX_FRAMES; j += STEP_BY) {
