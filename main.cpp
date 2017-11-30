@@ -116,6 +116,8 @@ void printAnomaly(_uint_ const & sequence, _uint_ const & frames1, _uint_ const 
 }
 
 int main() {
+    auto start = std::chrono::system_clock::now();
+
     std::cout << "Length of memory reference string: " << SEQUENCE_SIZE << std::endl
               << "Frames of physical memory: " << MAX_FRAMES << std::endl << std::endl;
 
@@ -151,6 +153,10 @@ int main() {
     }
 
     std::cout << std::endl << "Anomaly detected " << anomalyDetected << " times." << std::endl;
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::cout << "Program execution time: " << elapsed_seconds.count() << " seconds" << std::endl;
 
     return EXIT_SUCCESS;
 }
