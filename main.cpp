@@ -13,6 +13,8 @@
 #include <vector>
 #include <random>
 #include <map>
+#include <unordered_set>
+#include <chrono>
 
 // Change to larger uint if desired
 using _uint_ = uint16_t;
@@ -51,7 +53,8 @@ const _uint_ NUM_SEQUENCES = 100;
 std::shared_ptr<std::map<_uint_, std::shared_ptr<std::vector<_uint_>>>> generateSequences() {
     std::map<_uint_, std::shared_ptr<std::vector<_uint_>>> sequences;
 
-    std::default_random_engine generator;
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
     std::uniform_int_distribution<_uint_> distribution(MIN_PAGE_NUM, MAX_PAGE_NUM);
 
     // Generate NUM_SEQUENCES random sequences, each SEQUENCE_SIZE long
@@ -65,15 +68,43 @@ std::shared_ptr<std::map<_uint_, std::shared_ptr<std::vector<_uint_>>>> generate
     return std::make_shared<std::map<_uint_, std::shared_ptr<std::vector<_uint_>>>>(sequences);
 }
 
+// Tests a FIFO queue page replacement scheme for Belady's Anomaly using @num_frames memory frames and the provided @sequence
+// Returns the number of page faults that occurred
+_uint_ test(_uint_ const & num_frames, std::vector<_uint_> const & sequence) {
+
+    // Tracks the pages that are loaded into memory
+    std::unordered_set<_uint_> memory;
+
+    // FIFO queue tracking oldest page
+    std::queue<_uint_> queue;
+
+    // Number of page faults detected
+    _uint_ pageFaults;
+
+    for (auto && page : sequence) {
+        if (memory.find(page) == memory.end()) {
+            ++pageFaults;
+            if (memory.size() <= num_frames) {
+                memory.insert(page);
+                queue.push(page);
+            }
+            else {
+                memory.erase(queue.front());
+                queue.pop();
+            }
+        }
+    }
+
+    return pageFaults;
+}
+
 int main() {
     auto sequences_ptr = generateSequences();
 
     // See documentation on generateSequence to understand what this variable is
     std::map<_uint_, std::shared_ptr<std::vector<_uint_>>> & sequences = *sequences_ptr;
 
-    for (auto && page : *(sequences.at(0))) {
-        std::cout << page << std::endl;
-    }
+    std::cout << test(MIN_FRAMES, *sequences.at(0)) << std::endl;
 
     return EXIT_SUCCESS;
 }
