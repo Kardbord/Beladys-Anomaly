@@ -84,7 +84,7 @@ _uint_ test(_uint_ const & num_frames, std::vector<_uint_> const & sequence) {
     for (auto && page : sequence) {
         if (memory.find(page) == memory.end()) {
             ++pageFaults;
-            if (memory.size() <= num_frames) {
+            if (memory.size() < num_frames) {
                 memory.insert(page);
                 queue.push(page);
             }
