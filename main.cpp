@@ -44,14 +44,13 @@ const _uint_ NUM_SEQUENCES = 100;
 //
 // At its core, this function generates the needed sequences for the simulation.
 //
-// The return value, simplified: ptr<map<_uint_, ptr<vector<_uint_>>>>
-//      The return value is a pointer to a map:
-//          key  : _uint_ identifying the sequence
-//          value: pointer to a vector:
+// The return value, simplified: ptr<vector<ptr<vector<_uint_>>>>
+//      The return value is a pointer to a vector:
+//          entry: pointer to a vector:
 //              vector: contains _uint_ entries composing a page sequence
 //                  entry: a page id
-std::shared_ptr<std::map<_uint_, std::shared_ptr<std::vector<_uint_>>>> generateSequences() {
-    std::map<_uint_, std::shared_ptr<std::vector<_uint_>>> sequences;
+std::shared_ptr<std::vector<std::shared_ptr<std::vector<_uint_>>>> generateSequences() {
+    std::vector<std::shared_ptr<std::vector<_uint_>>> sequences;
 
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine generator(seed);
@@ -59,13 +58,13 @@ std::shared_ptr<std::map<_uint_, std::shared_ptr<std::vector<_uint_>>>> generate
 
     // Generate NUM_SEQUENCES random sequences, each SEQUENCE_SIZE long
     for (_uint_ i = 0; i < NUM_SEQUENCES; ++i) {
-        sequences.insert( std::make_pair(i, std::make_shared<std::vector<_uint_>>(std::vector<_uint_>())) );
+        sequences.push_back(std::make_shared<std::vector<_uint_>>(std::vector<_uint_>()));
         for (_uint_ j = 0; j < SEQUENCE_SIZE; ++j) {
             sequences.at(i)->push_back(distribution(generator));
         }
     }
 
-    return std::make_shared<std::map<_uint_, std::shared_ptr<std::vector<_uint_>>>>(sequences);
+    return std::make_shared<std::vector<std::shared_ptr<std::vector<_uint_>>>>(sequences);
 }
 
 // Tests a FIFO queue page replacement scheme for Belady's Anomaly using @num_frames memory frames and the provided @sequence
@@ -129,7 +128,7 @@ int main() {
     }
 
     // See documentation on generateSequence to understand what this variable is
-    std::map<_uint_, std::shared_ptr<std::vector<_uint_>>> & sequences = *sequences_ptr;
+    std::vector<std::shared_ptr<std::vector<_uint_>>> & sequences = *sequences_ptr;
 
 
     // Contains the number of page faults associated with each run of each sequence
