@@ -14,6 +14,7 @@
 #include <random>
 #include <map>
 #include <unordered_set>
+#include <array>
 #include <chrono>
 
 // Change to larger uint if desired
@@ -22,7 +23,8 @@ using _uint_ = uint16_t;
 // Size of the sequences to be simulated
 const _uint_ SEQUENCE_SIZE = 1000;
 
-// Minimum page id -- MUST BE SMALLER THAN MAX_PAGE_NUM
+// Minimum page id -- DO NOT CHANGE; WILL BREAK test() FUNCTION
+// Should always be 1
 const _uint_ MIN_PAGE_NUM = 1;
 
 // Maximum page id -- MUST BE LARGER THAN MIN_PAGE_NUM
@@ -72,7 +74,10 @@ std::shared_ptr<std::vector<std::shared_ptr<std::vector<_uint_>>>> generateSeque
 _uint_ test(_uint_ const & num_frames, std::vector<_uint_> const & sequence) {
 
     // Tracks the pages that are loaded into memory
-    std::unordered_set<_uint_> memory;
+    // Since MIN_PAGE_NUM is 1, any access must be offset by 1
+    // e.g. (memory[1] == true) means that page 2 is loaded in memory
+    std::array<bool, MAX_PAGE_NUM>  memory;
+    memory.fill(false);
 
     // FIFO queue tracking oldest page in memory
     std::queue<_uint_> queue;
@@ -80,17 +85,20 @@ _uint_ test(_uint_ const & num_frames, std::vector<_uint_> const & sequence) {
     // Number of page faults detected
     _uint_ pageFaults = 0;
 
+    _uint_ framesInMemory = 0;
+
     for (auto && page : sequence) {
-        if (memory.find(page) == memory.end()) {
+        if (!memory.at(page - 1)) {
             ++pageFaults;
-            if (memory.size() < num_frames) {
-                memory.insert(page);
+            if (framesInMemory < num_frames) {
+                ++framesInMemory;
+                memory[page - 1] = true;
                 queue.push(page);
             }
             else {
-                memory.erase(queue.front());
+                memory[queue.front() - 1] = false;
                 queue.pop();
-                memory.insert(page);
+                memory[page - 1] = true;
                 queue.push(page);
             }
         }
