@@ -83,13 +83,14 @@ _uint_ test(_uint_ const & num_frames, std::vector<_uint_> const & sequence) {
     // Number of page faults detected
     _uint_ pageFaults = 0;
 
-    _uint_ framesInMemory = 0;
+    // Number of pages loaded into memory
+    _uint_ loadedPages = 0;
 
     for (auto && page : sequence) {
         if (!memory.at(page - 1)) {
             ++pageFaults;
-            if (framesInMemory < num_frames) {
-                ++framesInMemory;
+            if (loadedPages < num_frames) {
+                ++loadedPages;
                 memory[page - 1] = true;
                 queue.push(page);
             }
