@@ -2,7 +2,7 @@
 // Tanner Kvarfordt      //
 // A02052217             //
 // CS 3100 --Dr. Mathias //
-// Assignment 4          //
+// Assignment 6          //
 ///////////////////////////
 
 #include <iostream>
