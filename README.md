@@ -2,14 +2,12 @@
 
 ### Tanner Kvarfordt
 
-### A02052217
-
 ### Preface
+
+This program was written for CS3100 (OS and concurrency). 
 
 The description below is taken directly from Dr. Mathias's canvas page for this assignment and modified
 to be a markdown file.
-
-See the assignment in Canvas for additional information.
 
 ### Introduction
 
